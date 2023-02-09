@@ -1,0 +1,33 @@
+{
+  "name": "next-plugin-websocket",
+  "version": "0.1.0",
+  "description": "Add websocket support to Next.js API routes",
+  "main": "dist/index.js",
+  "repository": "github.com/sam3d/next-plugin-websocket",
+  "author": "Sam Holmes",
+  "license": "MIT",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "dev": "tsc -w",
+    "build": "tsc",
+    "prepare": "tsc",
+    "format": "prettier --write \"**/*.{js,ts,md,json}\""
+  },
+  "dependencies": {
+    "ws": "8.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0",
+    "@types/ws": "8.5.4",
+    "next": "13.1.6",
+    "prettier": "2.8.4",
+    "prettier-plugin-organize-imports": "3.2.2",
+    "typescript": "4.9.5",
+    "webpack": "5.75.0"
+  },
+  "peerDependencies": {
+    "next": "^13"
+  }
+}
