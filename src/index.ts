@@ -1,3 +1,4 @@
+import * as Log from "next/dist/build/output/log";
 import { WebSocketServer } from "ws";
 
 import type { NextConfig } from "next";
@@ -23,11 +24,11 @@ class WebpackReloadSocketPlugin implements WebpackPluginInstance {
 export function _hook(this: NextNodeServer) {
   const server = this.serverOptions.httpServer;
   if (!server) {
-    console.warn("HTTP server not found");
+    Log.error("failed to load websocket plugin, no HTTP server provided");
     return;
   }
 
-  console.log("Successfully bound to Next.js server");
+  Log.ready("loaded websocket plugin successfully");
 
   const wss = new WebSocketServer({ noServer: true });
 
