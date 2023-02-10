@@ -22,14 +22,14 @@ class WebpackReloadSocketPlugin implements WebpackPluginInstance {
 }
 
 export function _hook(this: NextNodeServer) {
-  // We need a server instance to bind the websocket handler to
+  // We need a server instance to bind the WebSocket handler to
   const server = this.serverOptions.httpServer;
   if (!server) {
-    Log.error("failed to load websocket plugin, no HTTP server provided");
+    Log.error("failed to load WebSocket plugin, no HTTP server provided");
     return;
   }
 
-  Log.ready("loaded websocket plugin successfully");
+  Log.ready("loaded WebSocket plugin successfully");
 
   const wss = new WebSocketServer({ noServer: true });
 
@@ -48,7 +48,7 @@ export function _hook(this: NextNodeServer) {
     // Require the built page module when making this request
     const pageModule = await require(pagePath);
 
-    // Pass the socket handle to the websocket server
+    // Pass the socket handle to the WebSocket server
     wss.handleUpgrade(req, socket, head, pageModule.socket);
 
     // Add the socket to a list of open sockets so that we can close them all of
