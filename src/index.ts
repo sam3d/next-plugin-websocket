@@ -22,6 +22,7 @@ class WebpackReloadSocketPlugin implements WebpackPluginInstance {
 }
 
 export function _hook(this: NextNodeServer) {
+  // We need a server instance to bind the websocket handler to
   const server = this.serverOptions.httpServer;
   if (!server) {
     Log.error("failed to load websocket plugin, no HTTP server provided");
@@ -51,9 +52,10 @@ export function _hook(this: NextNodeServer) {
     wss.handleUpgrade(req, socket, head, pageModule.socket);
 
     // Add the socket to a list of open sockets so that we can close them all of
-    // the dev server reloads any file on the API. In future bind this to the
-    // specific route so that we only disconnect sockets that depended on a
-    // specific route for that handler
+    // the dev server reloads any file on the API
+    //
+    // TODO: Bind this to the specific route so that we only disconnect sockets
+    // that depended on a specific route for that handler
     if (this.serverOptions.dev) {
       openSockets.add(socket);
       socket.once("close", () => openSockets.delete(socket));
@@ -61,6 +63,7 @@ export function _hook(this: NextNodeServer) {
   });
 }
 
+// TODO: Re-add hot reloading support
 function withWebSocket(nextConfig: NextConfig): NextConfig {
   return {
     ...nextConfig,
