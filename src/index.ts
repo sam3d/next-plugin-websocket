@@ -2,23 +2,25 @@ import * as Log from "next/dist/build/output/log";
 import { WebSocket, WebSocketServer } from "ws";
 
 import type http from "http";
-import type { NextConfig } from "next";
 import type NextNodeServer from "next/dist/server/next-server";
 import type * as stream from "stream";
 import type { Compiler, WebpackPluginInstance } from "webpack";
 
 const openSockets = new Set<stream.Duplex>();
 
-class WebpackReloadSocketPlugin implements WebpackPluginInstance {
+export class WebpackNextWebSocketPlugin implements WebpackPluginInstance {
   apply(compiler: Compiler) {
-    compiler.hooks.afterEmit.tap("WebpackReloadSocketPlugin", (compilation) => {
-      for (const entry of compilation.entries.keys()) {
-        if (entry.startsWith("pages/api/")) {
-          openSockets.forEach((socket) => socket.end());
-          break;
+    compiler.hooks.afterEmit.tap(
+      "WebpackNextWebSocketPlugin",
+      (compilation) => {
+        for (const entry of compilation.entries.keys()) {
+          if (entry.startsWith("pages/api/")) {
+            openSockets.forEach((socket) => socket.end());
+            break;
+          }
         }
       }
-    });
+    );
   }
 }
 
@@ -73,19 +75,4 @@ export function _hook(this: NextNodeServer) {
       socket.once("close", () => openSockets.delete(socket));
     }
   });
-}
-
-// TODO: Re-add hot reloading support
-function withWebSocket(nextConfig: NextConfig): NextConfig {
-  return {
-    ...nextConfig,
-
-    webpack(config, context) {
-      if (context.isServer && context.dev) {
-        config.plugins.push(new WebpackReloadSocketPlugin());
-      }
-      nextConfig.webpack?.(config, context);
-      return config;
-    },
-  };
 }
