@@ -1,6 +1,7 @@
 import * as Log from "next/dist/build/output/log";
-import { WebSocketServer } from "ws";
+import { WebSocket, WebSocketServer } from "ws";
 
+import type http from "http";
 import type { NextConfig } from "next";
 import type NextNodeServer from "next/dist/server/next-server";
 import type * as stream from "stream";
@@ -20,6 +21,11 @@ class WebpackReloadSocketPlugin implements WebpackPluginInstance {
     });
   }
 }
+
+export type NextWebSocketHandler = (
+  client: WebSocket,
+  req: http.IncomingMessage
+) => void;
 
 export function _hook(this: NextNodeServer) {
   // We need a server instance to bind the WebSocket handler to
@@ -42,14 +48,20 @@ export function _hook(this: NextNodeServer) {
     // Ensure the page exists
     await this.ensureApiPage(url.pathname);
 
-    // Get the path of the page. This may throw an error so TODO to catch it
+    // TODO: If the page doesn't exist, this method will throw an error. This
+    // means a WebSocket connection was attempted on a non-existent page and we
+    // need to handle this correctly
     const pagePath = this.getPagePath(url.pathname);
 
     // Require the built page module when making this request
     const pageModule = await require(pagePath);
 
-    // Pass the socket handle to the WebSocket server
-    wss.handleUpgrade(req, socket, head, pageModule.socket);
+    // Ensure that the WebSocket handler callback exists
+    const handler = pageModule.socket as NextWebSocketHandler | undefined;
+    if (!handler) return;
+
+    // Call the provided WebSocket handler
+    wss.handleUpgrade(req, socket, head, handler);
 
     // Add the socket to a list of open sockets so that we can close them all of
     // the dev server reloads any file on the API
