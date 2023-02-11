@@ -4,12 +4,15 @@ Add WebSocket support to Next.js API routes
 
 ## Features
 
-- **Hot reloading** - whenever an API route is modified, any TCP sockets open for that page will be automatically disconnected.
+- **Zero configuration** - Just install the package and you're good to go
+- **Hot reloading** - Whenever an API route is modified, any sockets open for that page will be automatically disconnected
+- **URL routing** - The connection URL will get correctly mapped to the corresponding Next.js `/api` page
 
 ## Compatibility
 
-- ✅ Next.js ^13 (with or without `appDir`)
-- ✅ `output: "standalone"`
+- ✅ [Next.js 13](https://nextjs.org/blog/next-13)
+- ✅ [The new `app` directory](https://beta.nextjs.org/docs/routing/fundamentals)
+- ✅ [Standalone output mode](https://nextjs.org/docs/advanced-features/output-file-tracing)
 
 ## Installation
 
