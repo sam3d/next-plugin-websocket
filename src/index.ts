@@ -1,8 +1,11 @@
 import * as Log from "next/dist/build/output/log";
+import { isAPIRoute } from "next/dist/lib/is-api-route";
+import { isDynamicRoute } from "next/dist/shared/lib/router/utils/is-dynamic";
 import { WebSocket, WebSocketServer } from "ws";
 
 import type http from "http";
 import type NextNodeServer from "next/dist/server/next-server";
+import type { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import type * as stream from "stream";
 import type { Compiler, WebpackPluginInstance } from "webpack";
 
@@ -47,18 +50,39 @@ export function _hook(this: NextNodeServer) {
     // Ignore webpack dev server and other next-related requests
     if (url.pathname.startsWith("/_next")) return;
 
-    // Ensure the page exists
-    await this.ensureApiPage(url.pathname);
+    // Attempt to match the URL (potentially dynamic) to a page
+    let page = url.pathname;
+    let params: Params | undefined = undefined;
+    let isPageFound = !isDynamicRoute(page) && (await this.hasPage(page));
+    if (!isPageFound && this.dynamicRoutes) {
+      for (const dynamicRoute of this.dynamicRoutes) {
+        params = dynamicRoute.match(url.pathname) || undefined;
+        if (isAPIRoute(dynamicRoute.page) && params) {
+          page = dynamicRoute.page;
+          isPageFound = true;
+          break;
+        }
+      }
+    }
+    if (!isPageFound) return false;
 
-    // TODO: If the page doesn't exist, this method will throw an error. This
-    // means a WebSocket connection was attempted on a non-existent page and we
-    // need to handle this correctly
-    const pagePath = this.getPagePath(url.pathname);
+    // Ensure that the page gets built, if it exists
+    await this.ensureApiPage(page);
+
+    // Get the path of the built page. Will throw an error if the page doesn't
+    // exist. This is fine to ignore, as it just falls into one of the many
+    // other 404's that Next.js doesn't really do anything with
+    let builtPagePath;
+    try {
+      builtPagePath = this.getPagePath(page);
+    } catch (err) {
+      return;
+    }
 
     // Require the built page module when making this request
-    const pageModule = await require(pagePath);
+    const pageModule = await require(builtPagePath);
 
-    // Ensure that the WebSocket handler callback exists
+    // Ensure that the WebSocket handler callback exists on this page
     const handler = pageModule.socket as NextWebSocketHandler | undefined;
     if (!handler) return;
 
