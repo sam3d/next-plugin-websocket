@@ -14,7 +14,7 @@
     "build": "tsc",
     "prepare": "tsc",
     "format": "prettier --write \"**/*.{js,ts,md,json}\"",
-    "postinstall": "node dist/bin/patch.js"
+    "postinstall": "node dist/patch.js"
   },
   "dependencies": {
     "@babel/generator": "7.20.14",
