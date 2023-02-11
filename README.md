@@ -27,7 +27,6 @@ Export a `socket` handler function from a Next.js API route. The first argument 
 ### Basic example
 
 ```ts
-import { appRouter } from "@/server/routers/_app";
 import { NextApiHandler } from "next";
 import { NextWebSocketHandler } from "next-plugin-websocket";
 
