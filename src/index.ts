@@ -11,7 +11,7 @@ import type { Compiler, WebpackPluginInstance } from "webpack";
 
 const openSockets = new Set<stream.Duplex>();
 
-export class WebpackNextWebSocketPlugin implements WebpackPluginInstance {
+class WebpackNextWebSocketPlugin implements WebpackPluginInstance {
   apply(compiler: Compiler) {
     compiler.hooks.afterEmit.tap(
       "WebpackNextWebSocketPlugin",
@@ -32,7 +32,7 @@ export type NextWebSocketHandler = (
   req: http.IncomingMessage
 ) => void;
 
-export function _hook(this: NextNodeServer) {
+function hookNextNodeServer(this: NextNodeServer) {
   // We need a server instance to bind the WebSocket handler to
   const server = this.serverOptions.httpServer;
   if (!server) {
@@ -100,3 +100,8 @@ export function _hook(this: NextNodeServer) {
     }
   });
 }
+
+export {
+  hookNextNodeServer as _hookNextNodeServer,
+  WebpackNextWebSocketPlugin as _WebpackPlugin,
+};

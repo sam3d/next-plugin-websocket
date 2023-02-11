@@ -4,6 +4,8 @@ import template from "@babel/template";
 import * as t from "@babel/types";
 import fs from "fs/promises";
 
+const mod = template.expression.ast`require("next-plugin-websocket")`;
+
 async function main() {
   await patchNextNodeServer();
   await patchWebpackConfig();
@@ -28,7 +30,7 @@ async function patchNextNodeServer() {
   if (!constructorMethod) return;
 
   constructorMethod.body.body.push(
-    template.statement.ast`require("next-plugin-websocket")._hook.call(this)`
+    template.statement.ast`${mod}._hookNextNodeServer.call(this)`
   );
 
   await fs.writeFile(filePath, generate(ast).code);
@@ -55,7 +57,7 @@ async function patchWebpackConfig() {
     returnStatementIndex,
     0,
     template.statement
-      .ast`webpackConfig.plugins.push(new (require("next-plugin-websocket").WebpackNextWebSocketPlugin)())`
+      .ast`webpackConfig.plugins.push(new (${mod}._WebpackPlugin)());`
   );
 
   await fs.writeFile(filePath, generate(ast).code);
