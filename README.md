@@ -9,6 +9,7 @@ Add WebSocket support to Next.js API routes
 ## Compatibility
 
 - ✅ Next.js ^13 (with or without `appDir`)
+- ✅ `output: "standalone"`
 
 ## Installation
 

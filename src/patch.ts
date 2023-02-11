@@ -9,6 +9,7 @@ const mod = template.expression.ast`require("next-plugin-websocket")`;
 async function main() {
   await patchNextNodeServer();
   await patchWebpackConfig();
+  await patchStandaloneServer();
 }
 main();
 
@@ -61,4 +62,17 @@ async function patchWebpackConfig() {
   );
 
   await fs.writeFile(filePath, generate(ast).code);
+}
+
+async function patchStandaloneServer() {
+  const filePath = require.resolve("next/dist/build/utils");
+  const content = await fs.readFile(filePath, "utf-8");
+
+  const lines = content.split("\n");
+  const index = lines.findIndex((line) => line.endsWith("new NextServer({"));
+  const indent = lines[index + 1]?.match(/^\W*/)?.[0]!;
+
+  lines.splice(index + 1, 0, `${indent}httpServer: server,`);
+
+  await fs.writeFile(filePath, lines.join("\n"));
 }
