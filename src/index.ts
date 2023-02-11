@@ -45,6 +45,7 @@ function hookNextNodeServer(this: NextNodeServer) {
   const wss = new WebSocketServer({ noServer: true });
 
   server.on("upgrade", async (req, socket, head) => {
+    // Parse the request URL
     const url = new URL(req.url ?? "", "http://n");
 
     // Ignore webpack dev server and other next-related requests
@@ -93,7 +94,9 @@ function hookNextNodeServer(this: NextNodeServer) {
     // the dev server reloads any file on the API
     //
     // TODO: Bind this to the specific route so that we only disconnect sockets
-    // that depended on a specific route for that handler
+    // that depended on a specific route for that handler. This is not being
+    // done right now because trying to resolve a connected socket to a dynamic
+    // page path may be challenging
     if (this.serverOptions.dev) {
       openSockets.add(socket);
       socket.once("close", () => openSockets.delete(socket));
