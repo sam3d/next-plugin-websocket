@@ -33,8 +33,8 @@ export const socket: NextWebSocketHandler = (client, req) => {
   });
 };
 
-const handler: NextApiHandler = async (req, res) => {
-  res.send("Hello, world!");
+const handler: NextApiHandler = (req, res) => {
+  res.status(405).end();
 };
 
 export default handler;
@@ -44,8 +44,8 @@ export default handler;
 
 ```ts
 import { appRouter } from "@/server/routers/_app";
+import { createNextApiHandler } from "@trpc/server/adapters/next";
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
-import { NextApiHandler } from "next";
 import { NextWebSocketHandler } from "next-plugin-websocket";
 import { WebSocketServer } from "ws";
 
@@ -55,11 +55,9 @@ export const socket: NextWebSocketHandler = (client, req) => {
   wss.emit("connection", client, req);
 };
 
-const handler: NextApiHandler = async (req, res) => {
-  res.send("Hello, world!");
-};
-
-export default handler;
+export default createNextApiHandler({
+  router: appRouter,
+});
 ```
 
 ## Caveats
