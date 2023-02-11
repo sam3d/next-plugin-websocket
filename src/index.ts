@@ -9,7 +9,8 @@ import type { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import type * as stream from "stream";
 import type { Compiler, WebpackPluginInstance } from "webpack";
 
-const openSockets = new Set<stream.Duplex>();
+// Map open sockets to a page path
+const openSocketsMap = new Map<string, Set<stream.Duplex>>();
 
 class WebpackNextWebSocketPlugin implements WebpackPluginInstance {
   apply(compiler: Compiler) {
@@ -17,19 +18,21 @@ class WebpackNextWebSocketPlugin implements WebpackPluginInstance {
       "WebpackNextWebSocketPlugin",
       (compilation) => {
         for (const entry of compilation.entries.keys()) {
-          if (entry.startsWith("pages/api/")) {
-            const openSocketsCount = openSockets.size;
+          // Map the entry to a page relative URL. We should maybe use a more
+          // Next.js native process for doing this at some point
+          const key = entry.replace(/^pages(?=\/)/, "");
 
-            if (openSocketsCount > 0) {
-              openSockets.forEach((socket) => socket.end());
-              Log.event(
-                `refresh of ${entry} closed ${openSocketsCount} open ${
-                  openSocketsCount === 1 ? "websocket" : "websockets"
-                }`
-              );
-            }
+          // Find the sockets for this key
+          const sockets = openSocketsMap.get(key);
 
-            break;
+          // If there are open sockets, close them
+          if (sockets && sockets.size > 0) {
+            sockets.forEach((socket) => socket.end());
+            Log.event(
+              `refresh of ${key} closed ${sockets.size} open ${
+                sockets.size === 1 ? "websocket" : "websockets"
+              }`
+            );
           }
         }
       }
@@ -61,7 +64,9 @@ function hookNextNodeServer(this: NextNodeServer) {
     // Ignore webpack dev server and other next-related requests
     if (url.pathname.startsWith("/_next")) return;
 
-    // Attempt to match the URL (potentially dynamic) to a page
+    // Attempt to match the URL (potentially dynamic) to a page. This is copied
+    // straight over from the Next.js codebase that handles this same thing. A
+    // better abstraction might be nice for this at some point
     let page = url.pathname;
     let params: Params | undefined = undefined;
     let isPageFound = !isDynamicRoute(page) && (await this.hasPage(page));
@@ -100,16 +105,18 @@ function hookNextNodeServer(this: NextNodeServer) {
     // Call the provided websocket handler
     wss.handleUpgrade(req, socket, head, handler);
 
-    // Add the socket to a list of open sockets so that we can close them all of
-    // the dev server reloads any file on the API
-    //
-    // TODO: Bind this to the specific route so that we only disconnect sockets
-    // that depended on a specific route for that handler. This is not being
-    // done right now because trying to resolve a connected socket to a dynamic
-    // page path may be challenging
+    // Add the socket to its map of open sockets
     if (this.serverOptions.dev) {
-      openSockets.add(socket);
-      socket.once("close", () => openSockets.delete(socket));
+      const sockets =
+        openSocketsMap.get(page) ??
+        (() => {
+          const set = new Set<stream.Duplex>();
+          openSocketsMap.set(page, set);
+          return set;
+        })();
+
+      sockets.add(socket);
+      socket.once("close", () => sockets.delete(socket));
     }
   });
 }
