@@ -18,7 +18,17 @@ class WebpackNextWebSocketPlugin implements WebpackPluginInstance {
       (compilation) => {
         for (const entry of compilation.entries.keys()) {
           if (entry.startsWith("pages/api/")) {
-            openSockets.forEach((socket) => socket.end());
+            const openSocketsCount = openSockets.size;
+
+            if (openSocketsCount > 0) {
+              openSockets.forEach((socket) => socket.end());
+              Log.event(
+                `refresh of ${entry} closed ${openSocketsCount} open ${
+                  openSocketsCount === 1 ? "websocket" : "websockets"
+                }`
+              );
+            }
+
             break;
           }
         }
@@ -33,14 +43,14 @@ export type NextWebSocketHandler = (
 ) => void;
 
 function hookNextNodeServer(this: NextNodeServer) {
-  // We need a server instance to bind the WebSocket handler to
+  // We need a server instance to bind the websocket handler to
   const server = this.serverOptions.httpServer;
   if (!server) {
-    Log.error("failed to load WebSocket plugin, no HTTP server provided");
+    Log.error("failed to load websocket plugin, no HTTP server provided");
     return;
   }
 
-  Log.ready("loaded WebSocket plugin successfully");
+  Log.ready("loaded websocket plugin successfully");
 
   const wss = new WebSocketServer({ noServer: true });
 
@@ -83,11 +93,11 @@ function hookNextNodeServer(this: NextNodeServer) {
     // Require the built page module when making this request
     const pageModule = await require(builtPagePath);
 
-    // Ensure that the WebSocket handler callback exists on this page
+    // Ensure that the websocket handler callback exists on this page
     const handler = pageModule.socket as NextWebSocketHandler | undefined;
     if (!handler) return;
 
-    // Call the provided WebSocket handler
+    // Call the provided websocket handler
     wss.handleUpgrade(req, socket, head, handler);
 
     // Add the socket to a list of open sockets so that we can close them all of
