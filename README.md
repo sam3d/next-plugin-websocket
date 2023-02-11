@@ -5,7 +5,7 @@ Add WebSocket support to Next.js API routes
 ## Features
 
 - **Zero configuration** - Just install the package and you're good to go
-- **Hot reloading** - Whenever an API route is modified, any sockets open for that page will be automatically disconnected
+- **Hot reloading** - Whenever an API route is modified, any open sockets will be automatically disconnected
 - **URL routing** - The connection URL will get correctly mapped to the corresponding Next.js `/api` page
 
 ## Compatibility
@@ -22,17 +22,23 @@ yarn add next-plugin-websocket
 
 ## Usage
 
-Export a `socket` handler function from a Next.js API route. The first argument will be the WebSocket client and the second argument will be the original request object.
+Export a `socket` handler function from a Next.js API route. The first argument will be the `WebSocket` client instance and the second argument will be the original request object.
 
-### Basic example
+### Basic example (echo server)
 
 ```ts
 import { NextApiHandler } from "next";
 import { NextWebSocketHandler } from "next-plugin-websocket";
 
 export const socket: NextWebSocketHandler = (client, req) => {
+  console.log("Client connected");
+
   client.on("message", (msg) => {
     client.send(msg);
+  });
+
+  client.on("close", () => {
+    console.log("Client disconnected");
   });
 };
 
