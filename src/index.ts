@@ -102,11 +102,6 @@ function hookNextNodeServer(this: NextNodeServer) {
 
     // Add the socket to a list of open sockets so that we can close them all of
     // the dev server reloads any file on the API
-    //
-    // TODO: Bind this to the specific route so that we only disconnect sockets
-    // that depended on a specific route for that handler. This is not being
-    // done right now because trying to resolve a connected socket to a dynamic
-    // page path may be challenging
     if (this.serverOptions.dev) {
       openSockets.add(socket);
       socket.once("close", () => openSockets.delete(socket));
