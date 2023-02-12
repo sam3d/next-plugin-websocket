@@ -71,4 +71,8 @@ export default createNextApiHandler({
 
 ## Caveats
 
-_TODO_
+This plugin works by injecting a couple of micro-patches into the Next.js core in `node_modules`. It also uses a syntax tree parser to ensure that it ends up in exactly the right place, which makes it more resilient to changes over time. However, there are a couple of things to be aware of when using this module:
+
+1. It may not work with every permutation of Next.js, as it relies on patching at install time and Next.js may change internals relied upon by the syntax parser / patch injection pipeline
+2. Any node package manager that doesn't use a `node_modules` folder won't work, as that's how the patch is applied. This means no [Yarn PnP](https://yarnpkg.com/features/pnp) support (yet)
+3. Because it still relies on having access to a HTTP server instance to bind the HTTP upgrade handler, it won't work in environments that take full control of how Next.js is deployed (i.e. it doesn't use the `server.js` file generated in the `standalone` output mode, or `next start`). This means that serverless environments might be hit or miss depending on whether or not they provide an instance of [`http.Server`](https://nodejs.org/api/http.html#class-httpserver) to Next.js
