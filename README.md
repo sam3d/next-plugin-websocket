@@ -16,8 +16,22 @@ Add WebSocket support to Next.js API routes
 
 ## Installation
 
+#### NPM
+
+```sh
+npm install next-plugin-websocket
+```
+
+#### Yarn
+
 ```sh
 yarn add next-plugin-websocket
+```
+
+#### pNPM
+
+```sh
+pnpm install next-plugin-websocket
 ```
 
 ## Usage
