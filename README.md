@@ -42,8 +42,10 @@ export const socket: NextWebSocketHandler = (client, req) => {
   });
 };
 
+// You still need to expose a regular HTTP handler, even if you only intend to
+// use this API route for WebSocket connections.
 const handler: NextApiHandler = (req, res) => {
-  res.status(405).end();
+  res.status(426).send("Upgrade Required");
 };
 
 export default handler;
@@ -76,3 +78,4 @@ This plugin works by injecting a couple of micro-patches into the Next.js core i
 1. It may not work with every permutation of Next.js, as it relies on patching at install time and Next.js may change internals relied upon by the syntax parser / patch injection pipeline
 2. Any node package manager that doesn't use a `node_modules` folder won't work, as that's how the patch is applied. This means no [Yarn PnP](https://yarnpkg.com/features/pnp) support (yet)
 3. Because it still relies on having access to a HTTP server instance to bind the HTTP upgrade handler, it won't work in environments that take full control of how Next.js is deployed (i.e. it doesn't use the `server.js` file generated in the `standalone` output mode, or `next start`). This means that serverless environments might be hit or miss depending on whether or not they provide an instance of [`http.Server`](https://nodejs.org/api/http.html#class-httpserver) to Next.js
+4. You still must expose a regular HTTP handler from an API route, even if you only intend to use the socket handler
