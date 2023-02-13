@@ -12,8 +12,7 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "dev": "tsc -w",
-    "build": "rimraf dist && tsc -b",
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
     "prepare": "pnpm build",
     "format": "prettier --write \"**/*.{js,ts,md,json,yaml}\"",
     "postinstall": "node dist/patch.js"
