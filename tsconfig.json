@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "rootDir": "./src",
     "outDir": "./dist",
     "declaration": true,
     "esModuleInterop": true,
@@ -11,5 +10,6 @@
     "noUncheckedIndexedAccess": true,
     "noPropertyAccessFromIndexSignature": true,
     "skipLibCheck": true
-  }
+  },
+  "include": ["./src/index.ts", "./src/patch.ts"]
 }
