@@ -13,7 +13,7 @@
     "dev": "tsc -w",
     "build": "tsc",
     "prepare": "tsc",
-    "format": "prettier --write \"**/*.{js,ts,md,json}\"",
+    "format": "prettier --write \"**/*.{js,ts,md,json,yaml}\"",
     "postinstall": "node dist/patch.js"
   },
   "dependencies": {
