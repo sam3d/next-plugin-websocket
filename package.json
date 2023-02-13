@@ -2,13 +2,15 @@
   "name": "next-plugin-websocket",
   "version": "0.1.2",
   "description": "Add WebSocket support to Next.js API routes",
-  "main": "dist/index.js",
   "repository": "github.com/sam3d/next-plugin-websocket",
   "author": "Sam Holmes",
   "license": "MIT",
   "files": [
     "dist/**/*"
   ],
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
     "dev": "tsc -w",
     "build": "rimraf dist && tsc -b",
