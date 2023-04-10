@@ -10,8 +10,8 @@ Add WebSocket support to Next.js API routes
 
 ## Compatibility
 
-- ✅ [Next.js 13](https://nextjs.org/blog/next-13)
-- ✅ [The new `app` directory](https://beta.nextjs.org/docs/routing/fundamentals)
+- ✅ [Next.js 13](https://nextjs.org/blog/next-13) (tested on v13.3.0)
+- ✅ [The new `app` directory](https://beta.nextjs.org/docs/routing/fundamentals) (Can't use the new [Route Handlers](https://beta.nextjs.org/docs/routing/route-handlers))
 - ✅ [Standalone output mode](https://nextjs.org/docs/advanced-features/output-file-tracing)
 
 ## Installation
