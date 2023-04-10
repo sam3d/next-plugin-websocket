@@ -4,8 +4,7 @@ import { isDynamicRoute } from "next/dist/shared/lib/router/utils/is-dynamic";
 import { WebSocket, WebSocketServer } from "ws";
 
 import type http from "http";
-import type NextNodeServer1 from "next13.1.6/dist/server/next-server";
-import type NextNodeServer2 from "next13.3.0/dist/server/next-server";
+import type NextNodeServer from "next/dist/server/next-server";
 import type { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import type * as stream from "stream";
 import type { Compiler, WebpackPluginInstance } from "webpack";
@@ -42,8 +41,6 @@ export type NextWebSocketHandler = (
   client: WebSocket,
   req: http.IncomingMessage
 ) => void;
-
-type NextNodeServer = NextNodeServer1 | NextNodeServer2;
 
 function hookNextNodeServer(this: NextNodeServer) {
   // We need a server instance to bind the websocket handler to
