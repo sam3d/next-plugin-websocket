@@ -29,6 +29,8 @@
     "@types/babel__template": "7.4.1",
     "@types/node": "18.13.0",
     "next": "13.1.6",
+    "next13.1.6": "npm:next@13.1.6",
+    "next13.3.0": "npm:next@13.3.0",
     "prettier": "2.8.4",
     "prettier-plugin-organize-imports": "3.2.2",
     "typescript": "4.9.5",
