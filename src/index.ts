@@ -78,10 +78,10 @@ function hookNextNodeServer(this: NextNodeServer) {
     if (!isPageFound) return false;
 
     // Ensure that the page gets built, if it exists
-    if(this.ensureApiPage) {
+    if (this.ensureApiPage) {
       await this.ensureApiPage(page);
     } else {
-      await this.ensurePage({page, clientOnly: false});
+      await this.ensurePage({ page, clientOnly: false });
     }
 
     // Get the path of the built page. Will throw an error if the page doesn't
