@@ -75,7 +75,11 @@ function hookNextNodeServer(this: NextNodeServer) {
         }
       }
     }
-    if (!isPageFound) return false;
+    if (!isPageFound) {
+      Log.error(`failed to find page for websocket request: ${url.pathname}`);
+      return false;
+    }
+
 
     // Ensure that the page gets built, if it exists
     await this.ensureApiPage(page);
@@ -95,7 +99,10 @@ function hookNextNodeServer(this: NextNodeServer) {
 
     // Ensure that the websocket handler callback exists on this page
     const handler = pageModule.socket as NextWebSocketHandler | undefined;
-    if (!handler) return;
+    if (!handler) {
+      Log.error(`failed to find websocket handler for page: ${page}`);
+      return;
+    }
 
     // Call the provided websocket handler
     wss.handleUpgrade(req, socket, head, handler);
